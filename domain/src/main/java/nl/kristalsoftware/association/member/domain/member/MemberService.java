@@ -17,15 +17,14 @@ public class MemberService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public MemberReference registerMember(
-            String firstName,
-            String lastName,
-            Long birthDate,
-            String address,
-            String zipCode,
-            String city) {
+    public MemberReference signUpMember(
+            MemberName memberName,
+            MemberBirthDate memberBirthDate,
+            MemberAddress memberAddress,
+            MemberCity memberCity,
+            MemberZipCode memberZipCode) {
         Member member = memberDataStore.loadAggregate(eventPublisher);
-        member.handleCommand(SignUpMember.of(firstName, lastName, birthDate, address, zipCode, city));
+        member.handleCommand(SignUpMember.of(memberName, memberBirthDate, memberAddress, memberCity, memberZipCode));
         return member.getReference();
     }
 

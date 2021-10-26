@@ -25,20 +25,19 @@ import java.util.UUID;
 @RestController
 public class MemberController {
 
-    @Value("${team.datastore.viewstore.url}")
+    @Value("${member.datastore.viewstore.url}")
     private String url;
 
     private final MemberService memberService;
 
     @PostMapping(value = "/members", consumes = "application/json")
-    public ResponseEntity<Void> createMember(@RequestBody MemberData memberData) {
-        MemberReference memberReference = memberService.registerMember(
-                memberData.getFirstName(),
-                memberData.getLastName(),
-                memberData.getBirthDate(),
-                memberData.getAddress(),
-                memberData.getZip(),
-                memberData.getCity()
+    public ResponseEntity<Void> signUpMember(@RequestBody MemberData memberData) {
+        MemberReference memberReference = memberService.signUpMember(
+                MemberName.of(memberData.getFirstName(), memberData.getLastName()),
+                MemberBirthDate.of(memberData.getBirthDate()),
+                MemberAddress.of(memberData.getAddress()),
+                MemberCity.of(memberData.getCity()),
+                MemberZipCode.of(memberData.getZip())
         );
         return ResponseEntity.created(URI.create(url + memberReference.getValue().toString())).build();
     }

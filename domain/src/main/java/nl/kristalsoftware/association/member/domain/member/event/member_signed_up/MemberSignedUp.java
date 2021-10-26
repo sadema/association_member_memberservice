@@ -1,17 +1,29 @@
 package nl.kristalsoftware.association.member.domain.member.event.member_signed_up;
 
 import lombok.Getter;
-import nl.kristalsoftware.association.member.MemberEventData;
+import lombok.RequiredArgsConstructor;
+import nl.kristalsoftware.association.member.domain.member.MemberAddress;
+import nl.kristalsoftware.association.member.domain.member.MemberBirthDate;
+import nl.kristalsoftware.association.member.domain.member.MemberCity;
+import nl.kristalsoftware.association.member.domain.member.MemberName;
+import nl.kristalsoftware.association.member.domain.member.MemberReference;
+import nl.kristalsoftware.association.member.domain.member.MemberZipCode;
 import nl.kristalsoftware.domain.base.BaseEvent;
 
-public class MemberSignedUp implements BaseEvent<MemberEventData> {
+@Getter
+@RequiredArgsConstructor(staticName = "of")
+public class MemberSignedUp implements BaseEvent {
 
-    @Getter
-    private final MemberEventData eventData;
+    private final MemberReference memberReference;
 
-    public MemberSignedUp(MemberEventData eventData) {
-        this.eventData = eventData;
-        this.eventData.setDomainEventName(this.getClass().getSimpleName());
-    }
+    private final MemberName memberName;
+
+    private final MemberBirthDate memberBirthDate;
+
+    private final MemberAddress memberAddress;
+
+    private final MemberCity memberCity;
+
+    private final MemberZipCode memberZipCode;
 
 }

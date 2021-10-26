@@ -1,22 +1,18 @@
 package nl.kristalsoftware.association.member.domain.member;
 
 import lombok.Getter;
-import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
 import nl.kristalsoftware.association.member.domain.member.command.SignUpMember;
 import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEdited;
-import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEditedEventData;
 import nl.kristalsoftware.association.member.domain.member.event.member_signed_up.MemberSignedUp;
-import nl.kristalsoftware.association.member.domain.member.event.member_signed_up.MemberSignedUpEventData;
 import nl.kristalsoftware.domain.base.Aggregate;
 import nl.kristalsoftware.domain.base.BaseAggregateRoot;
-import nl.kristalsoftware.domain.base.BaseEvent;
 import nl.kristalsoftware.domain.base.annotations.AggregateRoot;
 import org.springframework.context.ApplicationEventPublisher;
 
 @Getter
 @AggregateRoot
-public class Member extends BaseAggregateRoot<MemberReference, BaseEvent<MemberEventData>> implements Aggregate {
+public class Member extends BaseAggregateRoot<MemberReference> implements Aggregate {
 
     private MemberName memberName;
 
@@ -28,47 +24,49 @@ public class Member extends BaseAggregateRoot<MemberReference, BaseEvent<MemberE
 
     private MemberZipCode memberZipCode;
 
-    public Member(MemberReference reference, ApplicationEventPublisher eventPublisher) {
+    private Member(MemberReference reference, ApplicationEventPublisher eventPublisher) {
         super(reference, eventPublisher);
     }
 
-    public void loadData(MemberSignedUpEventData memberSignedUpEventData) {
-        memberName = memberSignedUpEventData.getMemberName();
-        memberBirthDate = memberSignedUpEventData.getMemberBirthDate();
-        memberAddress = memberSignedUpEventData.getMemberAddress();
-        memberCity = memberSignedUpEventData.getMemberCity();
-        memberZipCode = memberSignedUpEventData.getMemberZipCode();
+    public static Member of(MemberReference reference, ApplicationEventPublisher eventPublisher) {
+        return new Member(reference, eventPublisher);
     }
 
-    public void loadData(MemberEditedEventData memberSignedUpEventData) {
-        memberName = memberSignedUpEventData.getMemberName();
-        memberBirthDate = memberSignedUpEventData.getMemberBirthDate();
-        memberAddress = memberSignedUpEventData.getMemberAddress();
-        memberCity = memberSignedUpEventData.getMemberCity();
-        memberZipCode = memberSignedUpEventData.getMemberZipCode();
+    public void loadData(MemberSignedUp memberSignedUp) {
+        memberName = memberSignedUp.getMemberName();
+        memberBirthDate = memberSignedUp.getMemberBirthDate();
+        memberAddress = memberSignedUp.getMemberAddress();
+        memberCity = memberSignedUp.getMemberCity();
+        memberZipCode = memberSignedUp.getMemberZipCode();
+    }
+
+    public void loadData(MemberEdited memberEdited) {
+        memberName = memberEdited.getMemberName();
+        memberBirthDate = memberEdited.getMemberBirthDate();
+        memberAddress = memberEdited.getMemberAddress();
+        memberCity = memberEdited.getMemberCity();
+        memberZipCode = memberEdited.getMemberZipCode();
     }
 
     public void handleCommand(SignUpMember command) {
-        MemberEventData memberEventData = MemberEventData.newBuilder()
-                .setFirstName(command.getFirstName())
-                .setLastName(command.getLastName())
-                .setBirthDate(command.getBirthDate())
-                .setAddress(command.getAddress())
-                .setCity(command.getCity())
-                .setZip(command.getZipCode())
-                .build();
-        sendEvent(new MemberSignedUp(memberEventData));
+        sendEvent(MemberSignedUp.of(
+                getReference(),
+                command.getMemberName(),
+                command.getMemberBirthDate(),
+                command.getMemberAddress(),
+                command.getMemberCity(),
+                command.getMemberZipCode()
+                ));
     }
 
     public void handleCommand(EditMember command) {
-        MemberEventData memberEventData = MemberEventData.newBuilder()
-                .setFirstName(command.getMemberName().getFirstName())
-                .setLastName(command.getMemberName().getLastName())
-                .setBirthDate(command.getMemberBirthDate().getDateInMillis())
-                .setAddress(command.getMemberAddress().getValue())
-                .setCity(command.getMemberCity().getValue())
-                .setZip(command.getMemberZipCode().getValue())
-                .build();
-        sendEvent(new MemberEdited(memberEventData));
+        sendEvent(MemberEdited.of(
+                getReference(),
+                command.getMemberName(),
+                command.getMemberBirthDate(),
+                command.getMemberAddress(),
+                command.getMemberCity(),
+                command.getMemberZipCode()
+        ));
     }
 }
