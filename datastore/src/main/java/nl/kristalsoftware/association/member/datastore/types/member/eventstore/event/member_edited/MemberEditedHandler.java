@@ -3,7 +3,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.kristalsoftware.association.member.MemberEventData;
-import nl.kristalsoftware.association.member.datastore.types.member.MemberDataService;
+import nl.kristalsoftware.association.member.datastore.types.member.MemberPersistenceService;
 import nl.kristalsoftware.association.member.domain.member.Member;
 import nl.kristalsoftware.association.member.domain.member.MemberAddress;
 import nl.kristalsoftware.association.member.domain.member.MemberBirthDate;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public final class MemberEditedHandler implements EventHandler<Member, MemberEditedEventEntity>, EventMessageHandler<MemberEventData> {
 
-    private final MemberDataService memberDataService;
+    private final MemberPersistenceService memberPersistenceService;
 
     @Override
     public Class<? extends BaseEvent> appliesTo() {
@@ -30,7 +30,7 @@ public final class MemberEditedHandler implements EventHandler<Member, MemberEdi
 
     @Override
     public void save(MemberEventData memberEventData) {
-        memberDataService.save(MemberEditedEventEntity.of(memberEventData));
+        memberPersistenceService.save(MemberEditedEventEntity.of(memberEventData));
     }
 
     @Override

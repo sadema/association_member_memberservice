@@ -3,6 +3,7 @@ package nl.kristalsoftware.association.member.domain.member;
 import lombok.RequiredArgsConstructor;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
 import nl.kristalsoftware.association.member.domain.member.command.SignUpMember;
+import nl.kristalsoftware.domain.base.EventStore;
 import nl.kristalsoftware.domain.base.PropertiesNotChangedException;
 import nl.kristalsoftware.domain.base.annotations.DomainService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 @DomainService
 public class MemberService {
 
-    private final MemberDataStore memberDataStore;
+    private final EventStore<Member,MemberReference> memberDataStore;
 
     private final ApplicationEventPublisher eventPublisher;
 

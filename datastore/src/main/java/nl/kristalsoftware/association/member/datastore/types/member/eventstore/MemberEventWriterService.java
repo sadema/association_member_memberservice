@@ -12,19 +12,12 @@ public class MemberEventWriterService {
 
     private final EventStoreRepository eventStoreRepository;
 
-//    @Override
-//    public <V extends BaseEventEntity> void saveEventEntity(V eventEntity) {
-//        eventStoreRepository.save(eventEntity);
-//    }
-
     public void save(MemberSignedUpEventEntity memberSignedUpEventEntity) {
         eventStoreRepository.save(memberSignedUpEventEntity);
-//        this.saveEventEntity(memberSignedUpEventEntity);
     }
 
     public void save(MemberEditedEventEntity memberEditedEventEntity) {
         eventStoreRepository.save(memberEditedEventEntity);
-//        this.saveEventEntity(memberEditedEventEntity);
     }
 
 }

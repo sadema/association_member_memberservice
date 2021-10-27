@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-public class MemberDataService {
+public class MemberPersistenceService {
 
     private final MemberEventWriterService memberEventWriterService;
 
