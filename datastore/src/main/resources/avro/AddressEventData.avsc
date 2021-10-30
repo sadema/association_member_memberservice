@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "MemberEventData",
+  "name": "AddressEventData",
   "namespace": "nl.kristalsoftware.association.member",
   "fields": [
     {
@@ -17,7 +17,7 @@
       "logicalType": "uuid"
     },
     {
-      "name": "firstName",
+      "name": "street",
       "type": [
         "null",
         "string"
@@ -25,7 +25,7 @@
       "default": null
     },
     {
-      "name": "lastName",
+      "name": "city",
       "type": [
         "null",
         "string"
@@ -33,16 +33,7 @@
       "default": null
     },
     {
-      "name": "birthDate",
-      "type": [
-        "null",
-        "long"
-      ],
-      "logicalType": "timestamp-millis",
-      "default": null
-    },
-    {
-      "name": "kind",
+      "name": "zip",
       "type": [
         "null",
         "string"

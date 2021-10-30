@@ -3,8 +3,15 @@ package nl.kristalsoftware.association.member.domain.member;
 import lombok.Getter;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
 import nl.kristalsoftware.association.member.domain.member.command.SignUpMember;
-import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEdited;
-import nl.kristalsoftware.association.member.domain.member.event.member_signed_up.MemberSignedUp;
+import nl.kristalsoftware.association.member.domain.member.event.MemberEvent;
+import nl.kristalsoftware.association.member.domain.member.event.MemberEventDefinition;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberEdited;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberKindChanged;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.Aggregate;
 import nl.kristalsoftware.domain.base.BaseAggregateRoot;
 import nl.kristalsoftware.domain.base.annotations.AggregateRoot;
@@ -18,11 +25,7 @@ public class Member extends BaseAggregateRoot<MemberReference> implements Aggreg
 
     private MemberBirthDate memberBirthDate;
 
-    private MemberAddress memberAddress;
-
-    private MemberCity memberCity;
-
-    private MemberZipCode memberZipCode;
+    private MemberKind memberKind;
 
     private Member(MemberReference reference, ApplicationEventPublisher eventPublisher) {
         super(reference, eventPublisher);
@@ -35,38 +38,48 @@ public class Member extends BaseAggregateRoot<MemberReference> implements Aggreg
     public void loadData(MemberSignedUp memberSignedUp) {
         memberName = memberSignedUp.getMemberName();
         memberBirthDate = memberSignedUp.getMemberBirthDate();
-        memberAddress = memberSignedUp.getMemberAddress();
-        memberCity = memberSignedUp.getMemberCity();
-        memberZipCode = memberSignedUp.getMemberZipCode();
+        memberKind = memberSignedUp.getMemberKind();
     }
 
     public void loadData(MemberEdited memberEdited) {
         memberName = memberEdited.getMemberName();
         memberBirthDate = memberEdited.getMemberBirthDate();
-        memberAddress = memberEdited.getMemberAddress();
-        memberCity = memberEdited.getMemberCity();
-        memberZipCode = memberEdited.getMemberZipCode();
+    }
+
+    public void loadData(MemberKindChanged memberStateChanged) {
+        memberKind = memberStateChanged.getMemberKind();
     }
 
     public void handleCommand(SignUpMember command) {
-        sendEvent(MemberSignedUp.of(
-                getReference(),
+        sendEvent(MemberEvent.of(getReference(),
+                MemberEventDefinition.MemberSignedUp,
                 command.getMemberName(),
                 command.getMemberBirthDate(),
-                command.getMemberAddress(),
-                command.getMemberCity(),
-                command.getMemberZipCode()
-                ));
+                command.getMemberKind()
+        ));
+//        sendEvent(MemberSignedUp.of(
+//                getReference(),
+//                command.getMemberName(),
+//                command.getMemberBirthDate(),
+//                command.getMemberState()
+//                ));
     }
 
     public void handleCommand(EditMember command) {
-        sendEvent(MemberEdited.of(
-                getReference(),
-                command.getMemberName(),
-                command.getMemberBirthDate(),
-                command.getMemberAddress(),
-                command.getMemberCity(),
-                command.getMemberZipCode()
-        ));
+        if (!memberKind.equals(command.getMemberKind())) {
+            sendEvent(MemberKindChanged.of(
+                    getReference(),
+                    command.getMemberKind()
+            ));
+        }
+        if (!(memberName.equals(command.getMemberName()) &&
+                memberBirthDate.equals(command.getMemberBirthDate()))) {
+            sendEvent(MemberEdited.of(
+                    getReference(),
+                    command.getMemberName(),
+                    command.getMemberBirthDate()
+            ));
+        }
     }
+
 }

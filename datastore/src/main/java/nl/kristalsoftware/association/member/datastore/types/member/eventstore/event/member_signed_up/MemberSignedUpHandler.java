@@ -5,12 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.association.member.datastore.types.member.MemberPersistenceService;
 import nl.kristalsoftware.association.member.domain.member.Member;
-import nl.kristalsoftware.association.member.domain.member.MemberAddress;
-import nl.kristalsoftware.association.member.domain.member.MemberBirthDate;
-import nl.kristalsoftware.association.member.domain.member.MemberCity;
-import nl.kristalsoftware.association.member.domain.member.MemberName;
-import nl.kristalsoftware.association.member.domain.member.MemberZipCode;
-import nl.kristalsoftware.association.member.domain.member.event.member_signed_up.MemberSignedUp;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
 import nl.kristalsoftware.datastore.base.eventstore.event.EventHandler;
 import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHandler;
 import nl.kristalsoftware.domain.base.BaseEvent;
@@ -40,9 +38,7 @@ public final class MemberSignedUpHandler implements EventHandler<Member, MemberS
                 member.getReference(),
                 MemberName.of(eventEntity.getFirstName(), eventEntity.getLastName()),
                 MemberBirthDate.of(eventEntity.getBirthDate()),
-                MemberAddress.of(eventEntity.getAddress()),
-                MemberCity.of(eventEntity.getCity()),
-                MemberZipCode.of(eventEntity.getZipCode())
+                MemberKind.of(eventEntity.getKind())
         );
         member.loadData(memberSignedUp);
     }

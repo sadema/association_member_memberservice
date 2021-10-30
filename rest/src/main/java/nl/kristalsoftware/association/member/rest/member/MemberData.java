@@ -11,10 +11,6 @@ public class MemberData {
 
     private Long birthDate = 0l;
 
-    private String address = "";
-
-    private String zip = "";
-
-    private String city = "";
+    private String state = "PLAYER";
 
 }

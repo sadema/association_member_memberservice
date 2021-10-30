@@ -1,4 +1,4 @@
-package nl.kristalsoftware.association.member.domain.member;
+package nl.kristalsoftware.association.member.domain.member.properties;
 
 import lombok.Getter;
 import nl.kristalsoftware.domain.base.TinyStringType;

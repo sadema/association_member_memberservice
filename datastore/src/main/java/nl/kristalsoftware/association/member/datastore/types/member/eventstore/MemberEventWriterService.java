@@ -2,6 +2,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore;
 
 import lombok.RequiredArgsConstructor;
 import nl.kristalsoftware.association.member.datastore.types.member.eventstore.event.member_edited.MemberEditedEventEntity;
+import nl.kristalsoftware.association.member.datastore.types.member.eventstore.event.member_kind_changed.MemberKindChangedEventEntity;
 import nl.kristalsoftware.association.member.datastore.types.member.eventstore.event.member_signed_up.MemberSignedUpEventEntity;
 import nl.kristalsoftware.datastore.base.eventstore.EventStoreRepository;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ public class MemberEventWriterService {
 
     public void save(MemberEditedEventEntity memberEditedEventEntity) {
         eventStoreRepository.save(memberEditedEventEntity);
+    }
+
+    public void save(MemberKindChangedEventEntity memberKindChangedEventEntity) {
+        eventStoreRepository.save(memberKindChangedEventEntity);
     }
 
 }

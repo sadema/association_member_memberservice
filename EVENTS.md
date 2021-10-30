@@ -5,9 +5,10 @@
 ### Producerende events
 | Command | Event | MemberEventData | API |
 |---------|-------|--------|-----|
-| SignUpMember | MemberSignedUp | firstName, lastName, birthDate |
+| SignUpMember | MemberSignedUp | firstName, lastName, birthDate, state |
 | EditMember | MemberEdited | firstName, lastName, birthDate |
-| QuitMember | MemberQuited | 
+| QuitMember | MemberQuited | |
+| ChangeMemberState | MemberStateChanged | memberState | 
 | AssignMemberRole | MemberRoleAssigned |
 | AddAddressToMember | AddressAddedToMember |
 | ClearAddress | AddressCleared |
@@ -20,8 +21,9 @@
 | MemberEventData | MemberAggregate<br>fieldType | MemberAggregate<br>Fieldname | Rest<br>MemberData | CQRS |
 |--------------| --------- | -------- | ----- | ----- |
 | reference | MemberReference | reference | | id |
-| firstName<br>lastName | MemberName | memberName | | firstName, lastName |
-| birthDate | MemberBirthDate | memberBirthDate | | birthDate |
+| firstName<br>lastName | MemberName | memberName | firstName, lastName |
+| birthDate | MemberBirthDate | memberBirthDate | birthDate |
+| state | MemberState | memberState | memberState |
 | roles | MemberRoles | memberRoles |
 | addressReferences | AddressReferences | addressReferences |  |  | 
 

@@ -1,13 +1,11 @@
 package nl.kristalsoftware.association.member.rest.member;
 
 import lombok.RequiredArgsConstructor;
-import nl.kristalsoftware.association.member.domain.member.MemberAddress;
-import nl.kristalsoftware.association.member.domain.member.MemberBirthDate;
-import nl.kristalsoftware.association.member.domain.member.MemberCity;
-import nl.kristalsoftware.association.member.domain.member.MemberName;
-import nl.kristalsoftware.association.member.domain.member.MemberReference;
 import nl.kristalsoftware.association.member.domain.member.MemberService;
-import nl.kristalsoftware.association.member.domain.member.MemberZipCode;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.PropertiesNotChangedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -35,23 +33,19 @@ public class MemberController {
         MemberReference memberReference = memberService.signUpMember(
                 MemberName.of(memberData.getFirstName(), memberData.getLastName()),
                 MemberBirthDate.of(memberData.getBirthDate()),
-                MemberAddress.of(memberData.getAddress()),
-                MemberCity.of(memberData.getCity()),
-                MemberZipCode.of(memberData.getZip())
+                MemberKind.of(memberData.getState())
         );
         return ResponseEntity.created(URI.create(url + memberReference.getValue().toString())).build();
     }
 
     @PutMapping(value = "/members/{memberReference}", consumes = "application/json")
-    public ResponseEntity<Void> editTeam(@RequestBody MemberData memberData, @PathVariable String memberReference) {
+    public ResponseEntity<Void> editMember(@RequestBody MemberData memberData, @PathVariable String memberReference) {
         try {
             memberService.editMember(
                     MemberReference.of(UUID.fromString(memberReference)),
                     MemberName.of(memberData.getFirstName(), memberData.getLastName()),
                     MemberBirthDate.of(memberData.getBirthDate()),
-                    MemberAddress.of(memberData.getAddress()),
-                    MemberCity.of(memberData.getCity()),
-                    MemberZipCode.of(memberData.getZip())
+                    MemberKind.of(memberData.getState())
             );
         } catch (PropertiesNotChangedException e) {
             ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();

@@ -25,7 +25,12 @@ public class MemberMessageConsumer extends EventConsumer<MemberEventData> {
         log.info("Member: Key: {}, Value: {}, Partition: {}, Offset: {}",
                 record.partition(), record.offset(), record.key(), record.value());
         EventMessageHandler eventMessageHandler = eventMessageHandlerProvider.getEventMessageHandler(record.value().getDomainEventName());
-        super.consumeData(eventMessageHandler, record);
+        if (eventMessageHandler != null) {
+            super.consumeData(eventMessageHandler, record);
+        }
+        else {
+            throw new IllegalStateException("No eventMessageHandler found!");
+        }
     }
 
 }

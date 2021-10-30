@@ -3,9 +3,12 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.domain.member.properties.Kind;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -20,42 +23,33 @@ public class MemberSignedUpEventEntity extends BaseEventEntity {
 
     private LocalDate birthDate;
 
-    private String address;
-
-    private String city;
-
-    private String zipCode;
+    @Enumerated(EnumType.STRING)
+    private Kind kind;
 
     private MemberSignedUpEventEntity(
             UUID reference,
             String domainEventName,
             String firstName,
             String lastName,
-            String address,
-            String city,
-            String zipCode
+            LocalDate birthDate,
+            Kind kind
     ) {
         super(reference, domainEventName);
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
-        this.address = address;
-        this.city = city;
-        this.zipCode = zipCode;
+        this.kind = kind;
     }
 
     public static MemberSignedUpEventEntity of(MemberEventData memberEventData) {
-        MemberSignedUpEventEntity entity = new MemberSignedUpEventEntity(
+        return new MemberSignedUpEventEntity(
                 UUID.fromString(memberEventData.getReference()),
                 memberEventData.getDomainEventName(),
                 memberEventData.getFirstName(),
                 memberEventData.getLastName(),
-                memberEventData.getAddress(),
-                memberEventData.getCity(),
-                memberEventData.getZip()
+                BaseEventEntity.getLocalDateFromMillis(memberEventData.getBirthDate()),
+                Kind.valueOf(memberEventData.getKind())
         );
-        entity.birthDate = entity.getLocalDateFromMillis(memberEventData.getBirthDate());
-        return entity;
     }
 
 }

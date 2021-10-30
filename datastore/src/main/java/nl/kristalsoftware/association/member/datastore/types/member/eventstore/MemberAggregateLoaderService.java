@@ -2,7 +2,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore;
 
 import lombok.RequiredArgsConstructor;
 import nl.kristalsoftware.association.member.domain.member.Member;
-import nl.kristalsoftware.association.member.domain.member.MemberReference;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.datastore.base.eventstore.BaseAggregateLoader;
 import nl.kristalsoftware.domain.base.EventStore;
 import org.springframework.context.ApplicationEventPublisher;

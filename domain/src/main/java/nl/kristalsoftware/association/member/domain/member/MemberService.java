@@ -3,6 +3,10 @@ package nl.kristalsoftware.association.member.domain.member;
 import lombok.RequiredArgsConstructor;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
 import nl.kristalsoftware.association.member.domain.member.command.SignUpMember;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.EventStore;
 import nl.kristalsoftware.domain.base.PropertiesNotChangedException;
 import nl.kristalsoftware.domain.base.annotations.DomainService;
@@ -14,18 +18,16 @@ import org.springframework.stereotype.Service;
 @DomainService
 public class MemberService {
 
-    private final EventStore<Member,MemberReference> memberDataStore;
+    private final EventStore<Member, MemberReference> eventStore;
 
     private final ApplicationEventPublisher eventPublisher;
 
     public MemberReference signUpMember(
             MemberName memberName,
             MemberBirthDate memberBirthDate,
-            MemberAddress memberAddress,
-            MemberCity memberCity,
-            MemberZipCode memberZipCode) {
-        Member member = memberDataStore.loadAggregate(eventPublisher);
-        member.handleCommand(SignUpMember.of(memberName, memberBirthDate, memberAddress, memberCity, memberZipCode));
+            MemberKind memberKind) {
+        Member member = eventStore.loadAggregate(eventPublisher);
+        member.handleCommand(SignUpMember.of(memberName, memberBirthDate, memberKind));
         return member.getReference();
     }
 
@@ -33,17 +35,15 @@ public class MemberService {
             MemberReference memberReference,
             MemberName memberName,
             MemberBirthDate memberBirthDate,
-            MemberAddress memberAddress,
-            MemberCity memberCity,
-            MemberZipCode memberZipCode) throws PropertiesNotChangedException {
-        Member member = memberDataStore.loadAggregate(memberReference, eventPublisher);
+            MemberKind memberKind) throws PropertiesNotChangedException {
+        Member member = eventStore.loadAggregate(memberReference, eventPublisher);
         if (member.getMemberName().equals(memberName) &&
                 member.getMemberBirthDate().equals(memberBirthDate) &&
-                member.getMemberAddress().equals(memberAddress) &&
-                member.getMemberCity().equals(memberCity) &&
-                member.getMemberZipCode().equals(memberZipCode)) {
-            throw new PropertiesNotChangedException("Member properties not changed");
+                member.getMemberKind().equals(memberKind)) {
+            throw new PropertiesNotChangedException("Memberproperties not changed!");
         }
-        member.handleCommand(EditMember.of(memberName, memberBirthDate, memberAddress, memberCity, memberZipCode));
+        else {
+            member.handleCommand(EditMember.of(memberName, memberBirthDate, memberKind));
+        }
     }
 }

@@ -1,4 +1,4 @@
-package nl.kristalsoftware.association.member.domain.member;
+package nl.kristalsoftware.association.member.domain.member.properties;
 
 import nl.kristalsoftware.domain.base.TinyUUIDType;
 import nl.kristalsoftware.domain.base.annotations.ValueObject;
