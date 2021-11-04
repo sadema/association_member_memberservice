@@ -24,7 +24,7 @@ public class MemberEventDataProducer {
         eventProducer.produceEvent(
                 kafkaTemplate,
                 topicname,
-                memberEventData.getReference(),
+                memberEventData.getReference().toString(),
                 memberEventData);
     }
 

@@ -2,6 +2,7 @@ package nl.kristalsoftware.association.member.domain.member.properties;
 
 import nl.kristalsoftware.domain.base.TinyDateType;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 public class MemberBirthDate extends TinyDateType {
@@ -16,5 +17,9 @@ public class MemberBirthDate extends TinyDateType {
 
     public static MemberBirthDate of(Long dateInMillis) {
         return new MemberBirthDate(TinyDateType.getLocalDateFromMillis(dateInMillis));
+    }
+
+    public static MemberBirthDate of(Instant instant) {
+        return new MemberBirthDate(getLocalDateFromInstant(instant));
     }
 }

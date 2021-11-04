@@ -31,12 +31,12 @@ public final class MemberKindChangedHandler implements EventHandler<Member, Memb
 
     @Override
     public void loadEventData(Member member, MemberKindChangedEventEntity eventEntity) {
-        log.info("MemberSignedUpEventEntity: {} {} {}", eventEntity.getReference(), eventEntity.getDomainEventName(), eventEntity.getKind());
-        MemberKindChanged memberStateChanged = MemberKindChanged.of(
+        log.info("MemberKindChangedEventEntity: {} {} {}", eventEntity.getReference(), eventEntity.getDomainEventName(), eventEntity.getKind());
+        MemberKindChanged memberKindChanged = MemberKindChanged.of(
                 member.getReference(),
                 MemberKind.of(eventEntity.getKind())
         );
-        member.loadData(memberStateChanged);
+        member.loadData(memberKindChanged);
     }
 
 }

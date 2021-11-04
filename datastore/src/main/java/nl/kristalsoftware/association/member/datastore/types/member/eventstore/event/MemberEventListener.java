@@ -19,10 +19,10 @@ public class MemberEventListener {
     public void onApplicationEvent(MemberEvent event) {
         MemberEventData memberEventData = MemberEventData.newBuilder()
                 .setDomainEventName(event.getDomainEventName().name())
-                .setReference(event.getMemberReference().getStringValue())
+                .setReference(event.getMemberReference().getValue())
                 .setFirstName(event.getMemberName().getFirstName())
                 .setLastName(event.getMemberName().getLastName())
-                .setBirthDate(event.getMemberBirthDate().getDateInMillis())
+                .setBirthDate(event.getMemberBirthDate().getInstant())
                 .setKind(event.getMemberKind().getValue().name())
                 .build();
         memberEventDataProducer.produce(memberEventData);

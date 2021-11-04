@@ -1,12 +1,15 @@
 package nl.kristalsoftware.association.member.domain.member;
 
 import lombok.Getter;
+import nl.kristalsoftware.association.member.domain.member.command.ChangeMemberKind;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
+import nl.kristalsoftware.association.member.domain.member.command.QuitMember;
 import nl.kristalsoftware.association.member.domain.member.command.SignUpMember;
 import nl.kristalsoftware.association.member.domain.member.event.MemberEvent;
 import nl.kristalsoftware.association.member.domain.member.event.MemberEventDefinition;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberEdited;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberKindChanged;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberQuited;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
@@ -46,8 +49,12 @@ public class Member extends BaseAggregateRoot<MemberReference> implements Aggreg
         memberBirthDate = memberEdited.getMemberBirthDate();
     }
 
-    public void loadData(MemberKindChanged memberStateChanged) {
-        memberKind = memberStateChanged.getMemberKind();
+    public void loadData(MemberKindChanged memberKindChanged) {
+        memberKind = memberKindChanged.getMemberKind();
+    }
+
+    public void loadData(MemberQuited memberQuited) {
+        // TODO: deleted flag zetten???
     }
 
     public void handleCommand(SignUpMember command) {
@@ -57,29 +64,47 @@ public class Member extends BaseAggregateRoot<MemberReference> implements Aggreg
                 command.getMemberBirthDate(),
                 command.getMemberKind()
         ));
-//        sendEvent(MemberSignedUp.of(
-//                getReference(),
-//                command.getMemberName(),
-//                command.getMemberBirthDate(),
-//                command.getMemberState()
-//                ));
     }
 
     public void handleCommand(EditMember command) {
         if (!memberKind.equals(command.getMemberKind())) {
-            sendEvent(MemberKindChanged.of(
+            sendEvent(MemberEvent.of(
                     getReference(),
+                    MemberEventDefinition.MemberKindChanged,
+                    command.getMemberName(),
+                    command.getMemberBirthDate(),
                     command.getMemberKind()
             ));
         }
         if (!(memberName.equals(command.getMemberName()) &&
                 memberBirthDate.equals(command.getMemberBirthDate()))) {
-            sendEvent(MemberEdited.of(
+            sendEvent(MemberEvent.of(
                     getReference(),
+                    MemberEventDefinition.MemberEdited,
                     command.getMemberName(),
-                    command.getMemberBirthDate()
+                    command.getMemberBirthDate(),
+                    command.getMemberKind()
             ));
         }
     }
 
+    public void handleCommand(QuitMember command) {
+        sendEvent(MemberEvent.of(
+                getReference(),
+                MemberEventDefinition.MemberQuited,
+                this.memberName,
+                this.memberBirthDate,
+                this.memberKind
+        ));
+    }
+
+    public void handleCommand(ChangeMemberKind changeMemberKind) {
+        sendEvent(MemberEvent.of(
+                getReference(),
+                MemberEventDefinition.MemberKindChanged,
+                this.memberName,
+                this.memberBirthDate,
+                changeMemberKind.getMemberKind()
+        ));
+    }
 }

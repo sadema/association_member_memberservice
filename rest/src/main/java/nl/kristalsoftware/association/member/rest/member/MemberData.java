@@ -11,6 +11,6 @@ public class MemberData {
 
     private Long birthDate = 0l;
 
-    private String state = "PLAYER";
+    private String kind = "PLAYER";
 
 }

@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @Data
-@Entity(name = "MemberStateChangedEvent")
+@Entity(name = "MemberKindChangedEvent")
 public class MemberKindChangedEventEntity extends BaseEventEntity {
 
     @Enumerated(EnumType.STRING)
@@ -30,7 +30,7 @@ public class MemberKindChangedEventEntity extends BaseEventEntity {
 
     public static MemberKindChangedEventEntity of(MemberEventData memberEventData) {
         return new MemberKindChangedEventEntity(
-                UUID.fromString(memberEventData.getReference()),
+                memberEventData.getReference(),
                 memberEventData.getDomainEventName(),
                 Kind.valueOf(memberEventData.getKind())
         );

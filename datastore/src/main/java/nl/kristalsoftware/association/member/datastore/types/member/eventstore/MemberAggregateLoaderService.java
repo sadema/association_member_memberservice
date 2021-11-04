@@ -26,7 +26,7 @@ public class MemberAggregateLoaderService extends BaseAggregateLoader<Member> im
 
     @Override
     public Member loadAggregate(MemberReference memberReference, ApplicationEventPublisher eventPublisher) {
-        return createMember(memberReference, eventPublisher);
+        return loadEvents(memberReference.getValue(), eventPublisher);
     }
 
     private Member createMember(MemberReference memberReference, ApplicationEventPublisher eventPublisher) {

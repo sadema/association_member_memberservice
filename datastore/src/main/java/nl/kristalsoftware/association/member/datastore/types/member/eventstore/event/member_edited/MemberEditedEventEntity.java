@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
+import nl.kristalsoftware.domain.base.TinyDateType;
 
 import javax.persistence.Entity;
 import java.time.LocalDate;
@@ -35,11 +36,11 @@ public class MemberEditedEventEntity extends BaseEventEntity {
 
     public static MemberEditedEventEntity of(MemberEventData memberEventData) {
         return new MemberEditedEventEntity(
-                UUID.fromString(memberEventData.getReference()),
+                memberEventData.getReference(),
                 memberEventData.getDomainEventName(),
                 memberEventData.getFirstName(),
                 memberEventData.getLastName(),
-                BaseEventEntity.getLocalDateFromMillis(memberEventData.getBirthDate())
+                TinyDateType.getLocalDateFromInstant(memberEventData.getBirthDate())
         );
     }
 

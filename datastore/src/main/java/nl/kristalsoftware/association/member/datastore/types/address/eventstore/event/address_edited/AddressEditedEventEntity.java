@@ -34,7 +34,7 @@ public class AddressEditedEventEntity extends BaseEventEntity {
 
     public static AddressEditedEventEntity of(AddressEventData addressEventData) {
         AddressEditedEventEntity entity = new AddressEditedEventEntity(
-                UUID.fromString(addressEventData.getReference()),
+                addressEventData.getReference(),
                 addressEventData.getDomainEventName(),
                 addressEventData.getStreet(),
                 addressEventData.getCity(),

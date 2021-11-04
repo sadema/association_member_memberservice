@@ -13,8 +13,7 @@
     },
     {
       "name": "reference",
-      "type": "string",
-      "logicalType": "uuid"
+      "type": {"type": "string", "logicalType": "uuid"}
     },
     {
       "name": "firstName",
@@ -35,10 +34,9 @@
     {
       "name": "birthDate",
       "type": [
-        "null",
-        "long"
+        {"type": "null"},
+        {"type": "long", "logicalType": "timestamp-millis"}
       ],
-      "logicalType": "timestamp-millis",
       "default": null
     },
     {

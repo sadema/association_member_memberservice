@@ -18,5 +18,4 @@ wait-for-url() {
 wait-for-url ${HOST}
 
 # member presets by http api
-curl http://localhost:9871/members -H "Content-Type: application/json" -d '{ "firstName": "Lorenzo", "lastName": "de Jager", "birthDate": 132447600000, "city": "Hensbroek", "zip": "5307 RE", "address": "Kickdreef 38" }'
-
+. postFakeMembers.sh

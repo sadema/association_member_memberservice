@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.association.member.domain.member.properties.Kind;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
+import nl.kristalsoftware.domain.base.TinyDateType;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -43,11 +44,11 @@ public class MemberSignedUpEventEntity extends BaseEventEntity {
 
     public static MemberSignedUpEventEntity of(MemberEventData memberEventData) {
         return new MemberSignedUpEventEntity(
-                UUID.fromString(memberEventData.getReference()),
+                memberEventData.getReference(),
                 memberEventData.getDomainEventName(),
                 memberEventData.getFirstName(),
                 memberEventData.getLastName(),
-                BaseEventEntity.getLocalDateFromMillis(memberEventData.getBirthDate()),
+                TinyDateType.getLocalDateFromInstant(memberEventData.getBirthDate()),
                 Kind.valueOf(memberEventData.getKind())
         );
     }

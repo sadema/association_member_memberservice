@@ -8,7 +8,7 @@
 | SignUpMember | MemberSignedUp | firstName, lastName, birthDate, state |
 | EditMember | MemberEdited | firstName, lastName, birthDate |
 | QuitMember | MemberQuited | |
-| ChangeMemberState | MemberStateChanged | memberState | 
+| ChangeMemberKind | MemberKindChanged | memberKind | 
 | AssignMemberRole | MemberRoleAssigned |
 | AddAddressToMember | AddressAddedToMember |
 | ClearAddress | AddressCleared |
