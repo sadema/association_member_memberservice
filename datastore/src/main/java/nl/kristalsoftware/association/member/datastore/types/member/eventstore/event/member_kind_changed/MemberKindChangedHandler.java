@@ -3,21 +3,25 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.kristalsoftware.association.member.MemberEventData;
-import nl.kristalsoftware.association.member.datastore.types.member.MemberPersistenceService;
+import nl.kristalsoftware.association.member.datastore.types.member.viewstore.MemberViewStore;
 import nl.kristalsoftware.association.member.domain.member.Member;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberKindChanged;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
+import nl.kristalsoftware.datastore.base.eventstore.EventStoreRepository;
 import nl.kristalsoftware.datastore.base.eventstore.event.EventHandler;
 import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHandler;
 import nl.kristalsoftware.domain.base.BaseEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public final class MemberKindChangedHandler implements EventHandler<Member, MemberKindChangedEventEntity>, EventMessageHandler<MemberEventData> {
+public class MemberKindChangedHandler implements EventHandler<Member, MemberKindChangedEventEntity>, EventMessageHandler<MemberEventData> {
 
-    private final MemberPersistenceService memberPersistenceService;
+    private final EventStoreRepository eventStoreRepository;
+
+    private final MemberViewStore memberViewStore;
 
     @Override
     public Class<? extends BaseEvent> appliesTo() {
@@ -25,12 +29,14 @@ public final class MemberKindChangedHandler implements EventHandler<Member, Memb
     }
 
     @Override
-    public void save(MemberEventData memberEventData) {
-        memberPersistenceService.save(MemberKindChangedEventEntity.of(memberEventData));
+    @Transactional
+    public void save(final MemberEventData memberEventData) {
+        eventStoreRepository.save(MemberKindChangedEventEntity.of(memberEventData));
+        memberViewStore.memberKindChanged(memberEventData);
     }
 
     @Override
-    public void loadEventData(Member member, MemberKindChangedEventEntity eventEntity) {
+    public void loadEventData(final Member member, final MemberKindChangedEventEntity eventEntity) {
         log.info("MemberKindChangedEventEntity: {} {} {}", eventEntity.getReference(), eventEntity.getDomainEventName(), eventEntity.getKind());
         MemberKindChanged memberKindChanged = MemberKindChanged.of(
                 member.getReference(),

@@ -18,12 +18,12 @@ public class MemberKind extends TinyType<Kind> {
 
     public static MemberKind of(String value) {
         if (value != null) {
-            return new MemberKind(getState(value));
+            return new MemberKind(getKind(value));
         }
         return new MemberKind(Kind.PLAYER);
     }
 
-    private static Kind getState(String value) {
+    private static Kind getKind(String value) {
         try {
             Kind kind = Kind.valueOf(value);
             return kind;

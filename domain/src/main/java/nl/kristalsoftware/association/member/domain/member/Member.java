@@ -1,6 +1,7 @@
 package nl.kristalsoftware.association.member.domain.member;
 
 import lombok.Getter;
+import nl.kristalsoftware.association.member.domain.address.properties.AddressReference;
 import nl.kristalsoftware.association.member.domain.member.command.ChangeMemberKind;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
 import nl.kristalsoftware.association.member.domain.member.command.QuitMember;
@@ -20,15 +21,19 @@ import nl.kristalsoftware.domain.base.BaseAggregateRoot;
 import nl.kristalsoftware.domain.base.annotations.AggregateRoot;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.List;
+
 @Getter
 @AggregateRoot
-public class Member extends BaseAggregateRoot<MemberReference> implements Aggregate {
+public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> implements Aggregate {
 
     private MemberName memberName;
 
     private MemberBirthDate memberBirthDate;
 
     private MemberKind memberKind;
+
+    private List<AddressReference> memberAddressess;
 
     private Member(MemberReference reference, ApplicationEventPublisher eventPublisher) {
         super(reference, eventPublisher);
