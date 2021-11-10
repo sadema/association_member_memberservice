@@ -14,10 +14,10 @@ curl -X PUT http://localhost:9874/_users
 curl -X PUT http://localhost:9874/_replicator
 curl -X PUT http://localhost:9874/members
 
-#cat <<'EOF' | curl -v http://localhost:5984/members -H "Content-type: application/json" -d "$(</dev/stdin)"
-#{
-#    "_id": "_design/team",
-#    "views": {
+cat <<'EOF' | curl -v http://localhost:5984/members -H "Content-type: application/json" -d "$(</dev/stdin)"
+{
+    "_id": "_design/member",
+    "views": {
 #        "new-players": {
 #            "map": "function (doc) {\n  if (doc.type === \"PLAYER\" && doc.team_reference === null) {\n    emit(doc._id, doc);\n  }\n}"
 #          },
@@ -30,9 +30,9 @@ curl -X PUT http://localhost:9874/members
 #        "all-teams-and-teamplayers": {
 #            "map": "function (doc) {\n  if (doc.type === \"TEAM\") {\n    emit(doc._id, doc);\n  }\n  else {\n    if (doc.type === \"PLAYER\" && doc.team_reference !== null) {\n      emit(doc.team_reference, doc);\n    }\n  }\n}"
 #          },
-#        "all-teams": {
-#            "map": "function (doc) {\n  if (doc.type === 'TEAM') {\n    emit(doc._id, doc);\n  }\n}"
-#          }
-#    }
-#}
-#EOF
+        "all-members": {
+            "map": "function (doc) {\n  if (doc.type === 'MEMBER') {\n    emit(doc._id, doc);\n  }\n}"
+          }
+    }
+}
+EOF
