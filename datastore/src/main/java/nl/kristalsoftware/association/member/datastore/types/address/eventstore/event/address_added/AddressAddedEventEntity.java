@@ -15,6 +15,8 @@ public class AddressAddedEventEntity extends BaseEventEntity {
 
     private String street;
 
+    private String streetNumber;
+
     private String city;
 
     private String zipCode;
@@ -23,11 +25,13 @@ public class AddressAddedEventEntity extends BaseEventEntity {
             UUID reference,
             String domainEventName,
             String street,
+            String streetNumber,
             String city,
             String zipCode
     ) {
         super(reference, domainEventName);
         this.street = street;
+        this.streetNumber = streetNumber;
         this.city = city;
         this.zipCode = zipCode;
     }
@@ -37,6 +41,7 @@ public class AddressAddedEventEntity extends BaseEventEntity {
                 addressEventData.getReference(),
                 addressEventData.getDomainEventName(),
                 addressEventData.getStreet(),
+                addressEventData.getStreetNumber(),
                 addressEventData.getCity(),
                 addressEventData.getZip()
         );

@@ -24,6 +24,14 @@
       "default": null
     },
     {
+      "name": "streetNumber",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
       "name": "city",
       "type": [
         "null",

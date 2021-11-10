@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import nl.kristalsoftware.association.member.domain.address.properties.City;
 import nl.kristalsoftware.association.member.domain.address.properties.Street;
+import nl.kristalsoftware.association.member.domain.address.properties.StreetNumber;
 import nl.kristalsoftware.association.member.domain.address.properties.ZipCode;
 
 @Data
@@ -11,6 +12,8 @@ import nl.kristalsoftware.association.member.domain.address.properties.ZipCode;
 public class EditAddress {
 
     private Street street;
+
+    private StreetNumber streetNumber;
 
     private City city;
 
