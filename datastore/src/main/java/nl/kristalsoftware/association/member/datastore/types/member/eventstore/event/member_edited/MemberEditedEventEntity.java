@@ -3,7 +3,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
-import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
+import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 import nl.kristalsoftware.domain.base.TinyDateType;
 
 import javax.persistence.Entity;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity(name = "MemberEditedEvent")
-public class MemberEditedEventEntity extends BaseEventEntity {
+public class MemberEditedEventEntity extends UUIDBaseEventEntity {
 
     private String firstName;
 

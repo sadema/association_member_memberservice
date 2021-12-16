@@ -1,0 +1,130 @@
+[
+  {
+    "type": "record",
+    "name": "AddressDetails",
+    "namespace": "nl.kristalsoftware.association.member",
+    "fields": [
+      {
+        "name": "zipCode",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "streetNumber",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "street",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "city",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      }
+    ]
+  },
+  {
+    "type": "record",
+    "name": "AddressEventData",
+    "namespace": "nl.kristalsoftware.association.member",
+    "fields": [
+      {
+        "name": "domainEventName",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "address",
+        "type": "AddressDetails"
+      }
+    ]
+  },
+  {
+    "type": "record",
+    "name": "MemberEventData",
+    "namespace": "nl.kristalsoftware.association.member",
+    "fields": [
+      {
+        "name": "domainEventName",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "reference",
+        "type": {
+          "type": "string",
+          "logicalType": "uuid"
+        }
+      },
+      {
+        "name": "firstName",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "lastName",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "birthDate",
+        "type": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "long",
+            "logicalType": "timestamp-millis"
+          }
+        ],
+        "default": null
+      },
+      {
+        "name": "kind",
+        "type": [
+          "null",
+          "string"
+        ],
+        "default": null
+      },
+      {
+        "name": "address",
+        "type": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "AddressDetails"
+          }
+        ]
+      }
+    ]
+  }
+]

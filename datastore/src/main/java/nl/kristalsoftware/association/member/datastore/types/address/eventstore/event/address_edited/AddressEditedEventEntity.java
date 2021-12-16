@@ -3,42 +3,38 @@ package nl.kristalsoftware.association.member.datastore.types.address.eventstore
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.AddressEventData;
-import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
+import nl.kristalsoftware.association.member.datastore.types.address.eventstore.event.AddressBaseEventEntity;
 
 import javax.persistence.Entity;
-import java.util.UUID;
 
 @NoArgsConstructor
 @Data
 @Entity(name = "AddressEditedEvent")
-public class AddressEditedEventEntity extends BaseEventEntity {
+public class AddressEditedEventEntity extends AddressBaseEventEntity {
 
     private String street;
 
     private String city;
 
-    private String zipCode;
-
     private AddressEditedEventEntity(
-            UUID reference,
+            String zipCode,
+            String streetNumber,
             String domainEventName,
             String street,
-            String city,
-            String zipCode
+            String city
     ) {
-        super(reference, domainEventName);
+        super(zipCode, streetNumber, domainEventName);
         this.street = street;
         this.city = city;
-        this.zipCode = zipCode;
     }
 
     public static AddressEditedEventEntity of(AddressEventData addressEventData) {
         AddressEditedEventEntity entity = new AddressEditedEventEntity(
-                addressEventData.getReference(),
+                addressEventData.getAddress().getZipCode(),
+                addressEventData.getAddress().getStreetNumber(),
                 addressEventData.getDomainEventName(),
-                addressEventData.getStreet(),
-                addressEventData.getCity(),
-                addressEventData.getZip()
+                addressEventData.getAddress().getStreet(),
+                addressEventData.getAddress().getCity()
         );
         return entity;
     }

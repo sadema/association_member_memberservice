@@ -3,47 +3,44 @@ package nl.kristalsoftware.association.member.datastore.types.address.eventstore
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.AddressEventData;
-import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
+import nl.kristalsoftware.association.member.datastore.types.address.eventstore.event.AddressBaseEventEntity;
 
 import javax.persistence.Entity;
-import java.util.UUID;
 
 @NoArgsConstructor
 @Data
+//@Table(uniqueConstraints = {
+//        @UniqueConstraint(
+//                name = "UniqueZipCodeAndStreetNumber",
+//                columnNames = {"zipCode", "streetNumber"}
+//        )
+//})
 @Entity(name = "AddressAddedEvent")
-public class AddressAddedEventEntity extends BaseEventEntity {
+public class AddressAddedEventEntity extends AddressBaseEventEntity {
 
     private String street;
 
-    private String streetNumber;
-
     private String city;
 
-    private String zipCode;
-
     private AddressAddedEventEntity(
-            UUID reference,
+            String zipCode,
+            String streetNumber,
             String domainEventName,
             String street,
-            String streetNumber,
-            String city,
-            String zipCode
+            String city
     ) {
-        super(reference, domainEventName);
+        super(zipCode, streetNumber, domainEventName);
         this.street = street;
-        this.streetNumber = streetNumber;
         this.city = city;
-        this.zipCode = zipCode;
     }
 
     public static AddressAddedEventEntity of(AddressEventData addressEventData) {
         AddressAddedEventEntity entity = new AddressAddedEventEntity(
-                addressEventData.getReference(),
+                addressEventData.getAddress().getZipCode(),
+                addressEventData.getAddress().getStreetNumber(),
                 addressEventData.getDomainEventName(),
-                addressEventData.getStreet(),
-                addressEventData.getStreetNumber(),
-                addressEventData.getCity(),
-                addressEventData.getZip()
+                addressEventData.getAddress().getStreet(),
+                addressEventData.getAddress().getCity()
         );
         return entity;
     }

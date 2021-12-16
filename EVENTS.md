@@ -10,11 +10,18 @@
 | QuitMember | MemberQuited | |
 | ChangeMemberKind | MemberKindChanged | memberKind | 
 | AssignMemberRole | MemberRoleAssigned |
+| AddConcernedPerson | concernedPersonAdded |
+| DisConnectConcernedPerson | concernedPersonDisconnected
 | AddAddressToMember | AddressAddedToMember |
 | ClearAddress | AddressCleared |
 | MoveMember | memberMoved |
-| AddConcernedPerson | concernedPersonAdded |
-| DisConnectConcernedPerson | concernedPersonDisconnected
+
+## AggregateRoot: ConcernedPerson
+
+### Producerende events
+| Command | Event | ConcernedPersonEventData | API |
+|---------|-------|--------|-----|
+| Add
 
 ## Event field mappings
 

@@ -1,23 +1,20 @@
 package nl.kristalsoftware.association.member.domain.address;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nl.kristalsoftware.association.member.domain.address.command.AddAddress;
 import nl.kristalsoftware.association.member.domain.address.command.EditAddress;
-import nl.kristalsoftware.association.member.domain.address.command.QuitAddress;
 import nl.kristalsoftware.association.member.domain.address.properties.AddressReference;
-import nl.kristalsoftware.association.member.domain.address.properties.City;
-import nl.kristalsoftware.association.member.domain.address.properties.Street;
-import nl.kristalsoftware.association.member.domain.address.properties.StreetNumber;
-import nl.kristalsoftware.association.member.domain.address.properties.ZipCode;
+import nl.kristalsoftware.association.member.domain.address.properties.CompoundAddress;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.EventStore;
-import nl.kristalsoftware.domain.base.PropertiesNotChangedException;
 import nl.kristalsoftware.domain.base.annotations.DomainService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @DomainService
 @Service
@@ -27,40 +24,33 @@ public class AddressService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    private final AddressPersistencePort addressPersistencePort;
+//    public AddressReference addAddress(CompoundAddress compoundAddress) {
+//        final Address address = eventStore.loadAggregate(compoundAddress.getAddressReference(), eventPublisher);
+//        if (address.notExists()) {
+//            address.handleCommand(AddAddress.of(compoundAddress));
+//        }
+//        return address.getReference();
+//    }
 
-    public Optional<UUID> getAddressReference(String zipCode, String streetNumber) {
-        return addressPersistencePort.getAddressReference(zipCode, streetNumber);
+//    public void editAddress(CompoundAddress compoundAddress) throws PropertiesNotChangedException {
+//        Address address = eventStore.loadAggregate(compoundAddress.getAddressReference(), eventPublisher);
+//        address.handleCommand(EditAddress.of(compoundAddress));
+//    }
+
+//    public void quitAddress(AddressReference addressReference) {
+//        Address address = eventStore.loadAggregate(addressReference, eventPublisher);
+//        address.handleCommand(QuitAddress.of());
+//    }
+
+    public void processAddresses(List<CompoundAddress> memberAddresses, MemberReference memberReference) {
+        for (CompoundAddress compoundAddress : memberAddresses) {
+            Address address = eventStore.loadAggregate(AddressReference.of(compoundAddress.getZipCode(), compoundAddress.getStreetNumber()), eventPublisher);
+            if (address.notExists()) {
+                address.handleCommand(AddAddress.of(compoundAddress));
+            }
+            else {
+                address.handleCommand(EditAddress.of(compoundAddress));
+            }
+        }
     }
-
-    public AddressReference addAddress(Street street, StreetNumber streetNumber, City city, ZipCode zipCode) {
-        final Address address = eventStore.loadAggregate(eventPublisher);
-        address.handleCommand(AddAddress.of(
-                street,
-                streetNumber,
-                city,
-                zipCode
-        ));
-        return address.getReference();
-    }
-
-    public void editAddress(AddressReference addressReference,
-                            Street street,
-                            StreetNumber streetNumber,
-                            City city,
-                            ZipCode zipCode) throws PropertiesNotChangedException {
-        Address address = eventStore.loadAggregate(addressReference, eventPublisher);
-        address.handleCommand(EditAddress.of(
-                street,
-                streetNumber,
-                city,
-                zipCode
-        ));
-    }
-
-    public void quitAddress(AddressReference addressReference) {
-        Address address = eventStore.loadAggregate(addressReference, eventPublisher);
-        address.handleCommand(QuitAddress.of());
-    }
-
 }

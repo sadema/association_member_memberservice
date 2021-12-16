@@ -1,13 +1,17 @@
 package nl.kristalsoftware.association.member.domain.member;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import nl.kristalsoftware.association.member.domain.address.properties.AddressReference;
-import nl.kristalsoftware.association.member.domain.member.command.ChangeMemberKind;
+import nl.kristalsoftware.association.member.domain.address.properties.CompoundAddress;
 import nl.kristalsoftware.association.member.domain.member.command.EditMember;
+import nl.kristalsoftware.association.member.domain.member.command.ProcessMemberAddresses;
 import nl.kristalsoftware.association.member.domain.member.command.QuitMember;
 import nl.kristalsoftware.association.member.domain.member.command.SignUpMember;
 import nl.kristalsoftware.association.member.domain.member.event.MemberEvent;
 import nl.kristalsoftware.association.member.domain.member.event.MemberEventDefinition;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressAssigned;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressUnAssigned;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberEdited;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberKindChanged;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberQuited;
@@ -21,11 +25,14 @@ import nl.kristalsoftware.domain.base.BaseAggregateRoot;
 import nl.kristalsoftware.domain.base.annotations.AggregateRoot;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Getter
 @AggregateRoot
-public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> implements Aggregate {
+public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> implements Aggregate<MemberReference> {
 
     private MemberName memberName;
 
@@ -33,7 +40,7 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
 
     private MemberKind memberKind;
 
-    private List<AddressReference> memberAddressess;
+    private List<AddressReference> addressReferences = new ArrayList<>();
 
     private Member(MemberReference reference, ApplicationEventPublisher eventPublisher) {
         super(reference, eventPublisher);
@@ -62,12 +69,22 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
         // TODO: deleted flag zetten???
     }
 
+    public void loadData(MemberAddressAssigned memberAddressAssigned) {
+        addressReferences.add(AddressReference.of(memberAddressAssigned.getZipCode(), memberAddressAssigned.getStreetNumber()));
+    }
+
+    public void loadData(MemberAddressUnAssigned memberAddressUnAssigned) {
+        boolean result = addressReferences.remove(memberAddressUnAssigned.getAddressReference());
+        log.info("remove operation: {}", result ? "successfull" : "failed");
+    }
+
     public void handleCommand(SignUpMember command) {
         sendEvent(MemberEvent.of(getReference(),
                 MemberEventDefinition.MemberSignedUp,
                 command.getMemberName(),
                 command.getMemberBirthDate(),
-                command.getMemberKind()
+                command.getMemberKind(),
+                null
         ));
     }
 
@@ -76,9 +93,10 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
             sendEvent(MemberEvent.of(
                     getReference(),
                     MemberEventDefinition.MemberKindChanged,
-                    command.getMemberName(),
-                    command.getMemberBirthDate(),
-                    command.getMemberKind()
+                    memberName,
+                    memberBirthDate,
+                    command.getMemberKind(),
+                    null
             ));
         }
         if (!(memberName.equals(command.getMemberName()) &&
@@ -88,7 +106,8 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
                     MemberEventDefinition.MemberEdited,
                     command.getMemberName(),
                     command.getMemberBirthDate(),
-                    command.getMemberKind()
+                    memberKind,
+                    null
             ));
         }
     }
@@ -99,17 +118,58 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
                 MemberEventDefinition.MemberQuited,
                 this.memberName,
                 this.memberBirthDate,
-                this.memberKind
+                this.memberKind,
+                null
         ));
     }
 
-    public void handleCommand(ChangeMemberKind changeMemberKind) {
-        sendEvent(MemberEvent.of(
-                getReference(),
-                MemberEventDefinition.MemberKindChanged,
-                this.memberName,
-                this.memberBirthDate,
-                changeMemberKind.getMemberKind()
-        ));
+    public void handleCommand(ProcessMemberAddresses processMemberAddresses) {
+        List<CompoundAddress> inMemberAddresses = processMemberAddresses.getInAddresses();
+        addressReferences.stream()
+                .filter(it -> getRemovedAddress(inMemberAddresses, it).isPresent())
+                .forEach(it -> {
+                    sendEvent(MemberEvent.of(
+                            getReference(),
+                            MemberEventDefinition.MemberAddressUnAssigned,
+                            this.memberName,
+                            this.memberBirthDate,
+                            this.memberKind,
+                            CompoundAddress.of(it.getZipCode(), it.getStreetNumber())
+                    ));
+                });
+        inMemberAddresses.stream()
+                .filter(it -> isNewAddress(it))
+                .forEach(it -> {
+                    sendEvent(MemberEvent.of(
+                            getReference(),
+                            MemberEventDefinition.MemberAddressAssigned,
+                            this.memberName,
+                            this.memberBirthDate,
+                            this.memberKind,
+                            it
+                    ));
+                });
     }
+
+    private Optional<AddressReference> getRemovedAddress(
+            List<CompoundAddress> memberAddresses,
+            AddressReference addressReference) {
+        if (memberAddresses.stream()
+                .anyMatch(it -> addressReference.equals(
+                        AddressReference.of(it.getZipCode(), it.getStreetNumber()))
+                )
+        ) {
+            return Optional.empty();
+        }
+        return Optional.of(addressReference);
+    }
+
+    private boolean isNewAddress(CompoundAddress compoundAddress) {
+        return !addressReferences.stream()
+                .anyMatch(it -> it.equals(
+                        AddressReference.of(compoundAddress.getZipCode(), compoundAddress.getStreetNumber())
+                    )
+                );
+    }
+
 }

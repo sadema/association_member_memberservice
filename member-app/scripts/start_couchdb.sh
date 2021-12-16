@@ -12,27 +12,18 @@ curl http://localhost:9874
 
 curl -X PUT http://localhost:9874/_users
 curl -X PUT http://localhost:9874/_replicator
-curl -X PUT http://localhost:9874/members
+curl -X PUT http://localhost:9874/memberserviceview
 
-cat <<'EOF' | curl -v http://localhost:5984/members -H "Content-type: application/json" -d "$(</dev/stdin)"
+cat <<'EOF' | curl -v -X PUT http://localhost:9874/memberserviceview/_design/member -H "Content-type: application/json" -d "$(</dev/stdin)"
 {
     "_id": "_design/member",
     "views": {
-#        "new-players": {
-#            "map": "function (doc) {\n  if (doc.type === \"PLAYER\" && doc.team_reference === null) {\n    emit(doc._id, doc);\n  }\n}"
-#          },
-#        "team-players": {
-#            "map": "function (doc) {\n  if (doc.team_reference) {\n    emit(doc.team_reference, doc);\n  }\n}"
-#          },
-#        "all-players": {
-#            "map": "function (doc) {\n  if (doc.type === 'PLAYER') {\n    emit(doc._id, doc);\n  }\n}"
-#          },
-#        "all-teams-and-teamplayers": {
-#            "map": "function (doc) {\n  if (doc.type === \"TEAM\") {\n    emit(doc._id, doc);\n  }\n  else {\n    if (doc.type === \"PLAYER\" && doc.team_reference !== null) {\n      emit(doc.team_reference, doc);\n    }\n  }\n}"
-#          },
         "all-members": {
-            "map": "function (doc) {\n  if (doc.type === 'MEMBER') {\n    emit(doc._id, doc);\n  }\n}"
-          }
+            "map": "function (doc) {\n  if (doc.type === 'MEMBER') {\n  var key = [doc.lastName, doc.firstName]; \n emit(key, doc);\n  }\n}"
+        },
+        "addressByZipCodeAndStreetNumber": {
+            "map": "function (doc) {\n if (doc.addresses) {\n doc.addresses.forEach(function(it) {\n if (it.zipCode && it.streetNumber) {\n emit([it.zipCode,it.streetNumber], it);\n }\n })\n }\n }"
+        }
     }
 }
 EOF

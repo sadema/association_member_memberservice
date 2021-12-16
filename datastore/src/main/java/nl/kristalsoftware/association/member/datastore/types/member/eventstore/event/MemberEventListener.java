@@ -2,6 +2,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.kristalsoftware.association.member.AddressDetails;
 import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.association.member.datastore.types.member.messaging.MemberEventDataProducer;
 import nl.kristalsoftware.association.member.domain.member.event.MemberEvent;
@@ -17,6 +18,15 @@ public class MemberEventListener {
 
     @EventListener
     public void onApplicationEvent(MemberEvent event) {
+        AddressDetails addressDetails = null;
+        if (event.getAddress() != null) {
+            addressDetails = AddressDetails.newBuilder()
+                    .setZipCode(event.getAddress().getZipCode().getValue())
+                    .setStreetNumber(event.getAddress().getStreetNumber().getValue())
+                    .setStreet(event.getAddress().getStreet().getValue())
+                    .setCity(event.getAddress().getCity().getValue())
+                    .build();
+        }
         MemberEventData memberEventData = MemberEventData.newBuilder()
                 .setDomainEventName(event.getDomainEventName().name())
                 .setReference(event.getMemberReference().getValue())
@@ -24,6 +34,7 @@ public class MemberEventListener {
                 .setLastName(event.getMemberName().getLastName())
                 .setBirthDate(event.getMemberBirthDate().getInstant())
                 .setKind(event.getMemberKind().getValue().name())
+                .setAddress(addressDetails)
                 .build();
         memberEventDataProducer.produce(memberEventData);
     }

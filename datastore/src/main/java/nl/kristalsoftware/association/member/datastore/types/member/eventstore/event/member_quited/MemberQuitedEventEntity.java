@@ -3,7 +3,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
-import nl.kristalsoftware.datastore.base.eventstore.event.entity.BaseEventEntity;
+import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 
 import javax.persistence.Entity;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity(name = "MemberQuitedEvent")
-public class MemberQuitedEventEntity extends BaseEventEntity {
+public class MemberQuitedEventEntity extends UUIDBaseEventEntity {
 
     private MemberQuitedEventEntity(
             UUID reference,

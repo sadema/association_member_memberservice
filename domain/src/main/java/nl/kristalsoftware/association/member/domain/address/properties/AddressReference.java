@@ -1,27 +1,44 @@
 package nl.kristalsoftware.association.member.domain.address.properties;
 
-import nl.kristalsoftware.domain.base.TinyUUIDType;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import nl.kristalsoftware.domain.base.TinyType;
 import nl.kristalsoftware.domain.base.annotations.ValueObject;
 
-import java.util.UUID;
-
 @ValueObject
-public class AddressReference extends TinyUUIDType {
+public class AddressReference extends TinyType<AddressReference.ZipCodeStreetNumber> {
 
-    private AddressReference(UUID value) {
-        super(value);
+    private AddressReference(ZipCode zipCode, StreetNumber streetNumber) {
+        super(ZipCodeStreetNumber.of(zipCode, streetNumber));
     }
 
-    public static AddressReference of(UUID value) {
-        return new AddressReference(value);
+    public static AddressReference of(ZipCode zipCode, StreetNumber streetNumber) {
+        return new AddressReference(zipCode, streetNumber);
     }
 
-    public static AddressReference of(String value) {
-        UUID uuid = null;
-        if (value != null && !value.isEmpty() && !value.equals("0")) {
-            uuid = UUID.fromString(value);
-        }
-        return new AddressReference(uuid);
+    @Override
+    public Boolean isEmpty() {
+        return getValue().getZipCode().isEmpty() && getValue().getStreetNumber().isEmpty();
+    }
+
+    public ZipCode getZipCode() {
+        return getValue().getZipCode();
+    }
+
+    public StreetNumber getStreetNumber() {
+        return getValue().getStreetNumber();
+    }
+
+    @EqualsAndHashCode
+    @Getter
+    @RequiredArgsConstructor(staticName = "of")
+    public static class ZipCodeStreetNumber {
+
+        private final ZipCode zipCode;
+
+        private final StreetNumber streetNumber;
+
     }
 
 }

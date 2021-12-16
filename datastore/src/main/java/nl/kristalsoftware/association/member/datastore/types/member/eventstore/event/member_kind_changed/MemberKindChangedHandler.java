@@ -7,7 +7,7 @@ import nl.kristalsoftware.association.member.datastore.types.member.viewstore.Me
 import nl.kristalsoftware.association.member.domain.member.Member;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberKindChanged;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
-import nl.kristalsoftware.datastore.base.eventstore.EventStoreRepository;
+import nl.kristalsoftware.datastore.base.eventstore.UUIDEventStoreRepository;
 import nl.kristalsoftware.datastore.base.eventstore.event.EventHandler;
 import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHandler;
 import nl.kristalsoftware.domain.base.BaseEvent;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class MemberKindChangedHandler implements EventHandler<Member, MemberKindChangedEventEntity>, EventMessageHandler<MemberEventData> {
 
-    private final EventStoreRepository eventStoreRepository;
+    private final UUIDEventStoreRepository eventStoreRepository;
 
     private final MemberViewStore memberViewStore;
 
