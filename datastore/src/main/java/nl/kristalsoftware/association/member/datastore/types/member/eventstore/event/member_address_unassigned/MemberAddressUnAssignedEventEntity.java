@@ -2,7 +2,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressUnAssigned;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 
 import javax.persistence.Entity;
@@ -28,12 +28,12 @@ public class MemberAddressUnAssignedEventEntity extends UUIDBaseEventEntity {
         this.streetNumber = streetNumber;
     }
 
-    public static MemberAddressUnAssignedEventEntity of(MemberEventData memberEventData) {
+    public static MemberAddressUnAssignedEventEntity of(MemberAddressUnAssigned memberAddressUnAssigned) {
         return new MemberAddressUnAssignedEventEntity(
-                memberEventData.getReference(),
-                memberEventData.getDomainEventName(),
-                memberEventData.getAddress().getZipCode(),
-                memberEventData.getAddress().getStreetNumber()
+                memberAddressUnAssigned.getMemberReference().getValue(),
+                memberAddressUnAssigned.getClass().getSimpleName(),
+                memberAddressUnAssigned.getAddressReference().getZipCode().getValue(),
+                memberAddressUnAssigned.getAddressReference().getStreetNumber().getValue()
         );
     }
 

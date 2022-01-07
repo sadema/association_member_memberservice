@@ -2,8 +2,8 @@ package nl.kristalsoftware.association.member.datastore.types.address.eventstore
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nl.kristalsoftware.association.member.AddressEventData;
 import nl.kristalsoftware.association.member.datastore.types.address.eventstore.event.AddressBaseEventEntity;
+import nl.kristalsoftware.association.member.domain.address.event.event_types.AddressEdited;
 
 import javax.persistence.Entity;
 
@@ -28,13 +28,13 @@ public class AddressEditedEventEntity extends AddressBaseEventEntity {
         this.city = city;
     }
 
-    public static AddressEditedEventEntity of(AddressEventData addressEventData) {
+    public static AddressEditedEventEntity of(AddressEdited addressEdited) {
         AddressEditedEventEntity entity = new AddressEditedEventEntity(
-                addressEventData.getAddress().getZipCode(),
-                addressEventData.getAddress().getStreetNumber(),
-                addressEventData.getDomainEventName(),
-                addressEventData.getAddress().getStreet(),
-                addressEventData.getAddress().getCity()
+                addressEdited.getZipCode().getValue(),
+                addressEdited.getStreetNumber().getValue(),
+                addressEdited.getClass().getSimpleName(),
+                addressEdited.getStreet().getValue(),
+                addressEdited.getCity().getValue()
         );
         return entity;
     }

@@ -2,7 +2,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressAssigned;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 
 import javax.persistence.Entity;
@@ -17,6 +17,10 @@ public class MemberAddressAssignedEventEntity extends UUIDBaseEventEntity {
 
     private String streetNumber;
 
+    private String street;
+
+    private String city;
+
     private MemberAddressAssignedEventEntity(
             UUID reference,
             String domainEventName,
@@ -28,12 +32,12 @@ public class MemberAddressAssignedEventEntity extends UUIDBaseEventEntity {
         this.streetNumber = streetNumber;
     }
 
-    public static MemberAddressAssignedEventEntity of(MemberEventData memberEventData) {
+    public static MemberAddressAssignedEventEntity of(MemberAddressAssigned memberAddressAssigned) {
         return new MemberAddressAssignedEventEntity(
-                memberEventData.getReference(),
-                memberEventData.getDomainEventName(),
-                memberEventData.getAddress().getZipCode(),
-                memberEventData.getAddress().getStreetNumber()
+                memberAddressAssigned.getMemberReference().getValue(),
+                memberAddressAssigned.getClass().getSimpleName(),
+                memberAddressAssigned.getZipCode().getValue(),
+                memberAddressAssigned.getStreetNumber().getValue()
         );
     }
 

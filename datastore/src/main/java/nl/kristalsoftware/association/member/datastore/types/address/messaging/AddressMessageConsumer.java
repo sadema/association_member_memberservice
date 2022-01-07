@@ -7,7 +7,6 @@ import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHa
 import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHandlerProvider;
 import nl.kristalsoftware.datastore.base.messaging.EventConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,7 @@ public class AddressMessageConsumer extends EventConsumer<AddressEventData> {
     private final EventMessageHandlerProvider eventMessageHandlerProvider;
 
     @Transactional
-    @KafkaListener(topics = "${member.kafka.address.topicname}") //, containerFactory = "playerKafkaListenerContainerFactory")
+//    @KafkaListener(topics = "${member.kafka.address.topicname}") //, containerFactory = "playerKafkaListenerContainerFactory")
     public void consumeData(@Payload ConsumerRecord<String, AddressEventData> record) {
         log.info("Member: Key: {}, Value: {}, Partition: {}, Offset: {}",
                 record.partition(), record.offset(), record.key(), record.value());

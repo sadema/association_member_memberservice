@@ -1,8 +1,13 @@
 package nl.kristalsoftware.association.member.datastore.types.member.viewstore;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.association.member.datastore.types.address.viewstore.AddressDocumentPart;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressAssigned;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressUnAssigned;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberQuited;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
+import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEdited;
+import nl.kristalsoftware.association.member.domain.member.event.member_kind_changed.MemberKindChanged;
 import nl.kristalsoftware.datastore.base.viewstore.BaseCouchDBViewStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,49 +26,55 @@ public class MemberViewStore extends BaseCouchDBViewStore<MemberDocument> {
     @Value("${member.datastore.viewstore.url}")
     private String memberDatabaseUrl;
 
-    public void memberSignedUp(MemberEventData eventData) {
-        String url = memberDatabaseUrl + eventData.getReference();
-        MemberDocument memberDocument = MemberDocument.of(eventData);
+    public void memberSignedUp(MemberSignedUp memberSignedUp) {
+        String url = memberDatabaseUrl + memberSignedUp.getMemberReference().getStringValue();
+        MemberDocument memberDocument = MemberDocument.of(memberSignedUp);
         createOrUpdateDocument(url, memberDocument);
     }
 
-    public void memberEdited(MemberEventData eventData) {
-        String url = memberDatabaseUrl + eventData.getReference();
+    public void memberEdited(MemberEdited memberEdited) {
+        String url = memberDatabaseUrl + memberEdited.getMemberReference().getStringValue();
         MemberDocument memberDocument = getDocument(url, MemberDocument.class);
-        memberDocument.setFirstName(eventData.getFirstName());
-        memberDocument.setLastName(eventData.getLastName());
-        memberDocument.setBirthDate(eventData.getBirthDate().toEpochMilli());
+        memberDocument.setFirstName(memberEdited.getMemberName().getFirstName());
+        memberDocument.setLastName(memberEdited.getMemberName().getLastName());
+        memberDocument.setBirthDate(memberEdited.getMemberBirthDate().getDateInMillis());
         createOrUpdateDocument(url, memberDocument);
     }
 
-    public void memberKindChanged(MemberEventData eventData) {
-        String url = memberDatabaseUrl + eventData.getReference();
+    public void memberKindChanged(MemberKindChanged memberKindChanged) {
+        String url = memberDatabaseUrl + memberKindChanged.getMemberReference().getStringValue();
         MemberDocument memberDocument = getDocument(url, MemberDocument.class);
-        memberDocument.setKind(eventData.getKind());
+        memberDocument.setKind(memberKindChanged.getMemberKind().getValue().name());
         createOrUpdateDocument(url, memberDocument);
     }
 
-    public void memberQuited(MemberEventData eventData) {
-        String url = memberDatabaseUrl + eventData.getReference();
+    public void memberQuited(MemberQuited eventData) {
+        String url = memberDatabaseUrl + eventData.getMemberReference().getStringValue();
         MemberDocument memberDocument = getDocument(url, MemberDocument.class);
         deleteDocument(url + "?rev=" + memberDocument.get_rev());
     }
 
-    public void memberAddressAssigned(MemberEventData eventData) {
-        String memberUrl = memberDatabaseUrl + eventData.getReference();
+    public void memberAddressAssigned(MemberAddressAssigned memberAddressAssigned) {
+        String memberUrl = memberDatabaseUrl + memberAddressAssigned.getMemberReference().getStringValue();
         MemberDocument memberDocument = getDocument(memberUrl, MemberDocument.class);
-        memberDocument.getAddresses().add(AddressDocumentPart.of(eventData));
+        memberDocument.getAddresses().add(
+                AddressDocumentPart.of(memberAddressAssigned.getZipCode(),
+                        memberAddressAssigned.getStreetNumber(),
+                        memberAddressAssigned.getStreet(),
+                        memberAddressAssigned.getCity()
+                )
+        );
         createOrUpdateDocument(memberUrl, memberDocument);
     }
 
-    public void memberAddressUnAssigned(MemberEventData eventData) {
-        String memberUrl = memberDatabaseUrl + eventData.getReference();
+    public void memberAddressUnAssigned(MemberAddressUnAssigned memberAddressUnAssigned) {
+        String memberUrl = memberDatabaseUrl + memberAddressUnAssigned.getMemberReference().getStringValue();
         MemberDocument memberDocument = getDocument(memberUrl, MemberDocument.class);
-        log.info("ZipCode: {} StreetNumber: {}", eventData.getAddress().getZipCode(), eventData.getAddress().getStreetNumber());
+        log.info("ZipCode: {} StreetNumber: {}", memberAddressUnAssigned.getAddressReference().getZipCode(), memberAddressUnAssigned.getAddressReference().getStreetNumber());
         log.info("Document: {}", memberDocument);
         Optional<AddressDocumentPart> optionalRemovedAddress = memberDocument.getAddresses().stream()
-                .filter(it -> it.getZipCode().equals(eventData.getAddress().getZipCode()))
-                .filter(it -> it.getStreetNumber().equals(eventData.getAddress().getStreetNumber()))
+                .filter(it -> it.getZipCode().equals(memberAddressUnAssigned.getAddressReference().getZipCode().getValue()))
+                .filter(it -> it.getStreetNumber().equals(memberAddressUnAssigned.getAddressReference().getStreetNumber().getValue()))
                 .findFirst();
         optionalRemovedAddress.ifPresent(it -> {
             memberDocument.getAddresses().remove(it);

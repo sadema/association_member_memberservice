@@ -2,15 +2,14 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.datastore.types.member.eventstore.event.member_signed_up.NewUUIDEventStoreRepository;
 import nl.kristalsoftware.association.member.datastore.types.member.viewstore.MemberViewStore;
 import nl.kristalsoftware.association.member.domain.member.Member;
-import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberEdited;
+import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEdited;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
-import nl.kristalsoftware.datastore.base.eventstore.UUIDEventStoreRepository;
-import nl.kristalsoftware.datastore.base.eventstore.event.EventHandler;
-import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHandler;
+import nl.kristalsoftware.datastore.base.eventstore.event.EventLoadHandler;
+import nl.kristalsoftware.datastore.base.eventstore.event.EventSaveHandler;
 import nl.kristalsoftware.domain.base.BaseEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class MemberEditedHandler implements EventHandler<Member, MemberEditedEventEntity>, EventMessageHandler<MemberEventData> {
+public class MemberEditedHandler implements
+        EventLoadHandler<Member, MemberEditedEventEntity>,
+        EventSaveHandler<Member, MemberEdited> {
 
-    private final UUIDEventStoreRepository eventStoreRepository;
+    private final NewUUIDEventStoreRepository eventStoreRepository;
 
     private final MemberViewStore memberViewStore;
 
@@ -31,13 +32,14 @@ public class MemberEditedHandler implements EventHandler<Member, MemberEditedEve
 
     @Override
     @Transactional
-    public void save(final MemberEventData memberEventData) {
-        eventStoreRepository.save(MemberEditedEventEntity.of(memberEventData));
-        memberViewStore.memberEdited(memberEventData);
+    public void save(final Member member, final MemberEdited memberEdited) {
+        MemberEditedEventEntity memberEditedEventEntity = MemberEditedEventEntity.of(memberEdited, member.getCurrentState());
+        eventStoreRepository.save(memberEditedEventEntity);
+        memberViewStore.memberEdited(memberEdited);
     }
 
     @Override
-    public void loadEventData(final Member member, final MemberEditedEventEntity eventEntity) {
+    public void loadEvent(final Member member, final MemberEditedEventEntity eventEntity) {
         log.info("MemberEditedEventEntity: {} {} {}", eventEntity.getReference(), eventEntity.getDomainEventName(), eventEntity.getFirstName() + " " + eventEntity.getLastName());
         MemberEdited memberEdited = MemberEdited.of(
                 member.getReference(),

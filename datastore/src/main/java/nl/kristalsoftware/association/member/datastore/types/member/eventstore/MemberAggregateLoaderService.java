@@ -6,7 +6,7 @@ import nl.kristalsoftware.association.member.domain.member.properties.MemberRefe
 import nl.kristalsoftware.datastore.base.eventstore.BaseAggregateLoader;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 import nl.kristalsoftware.domain.base.EventStore;
-import org.springframework.context.ApplicationEventPublisher;
+import nl.kristalsoftware.domain.base.PersistenceHandlerPort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,7 +17,7 @@ public class MemberAggregateLoaderService extends BaseAggregateLoader<Member, UU
     }
 
     @Override
-    public Member loadAggregate(MemberReference memberReference, ApplicationEventPublisher eventPublisher) {
+    public Member loadAggregate(MemberReference memberReference, PersistenceHandlerPort<Member> eventPublisher) {
         Member member = Member.of(memberReference, eventPublisher);
         loadEvents(member);
         return member;

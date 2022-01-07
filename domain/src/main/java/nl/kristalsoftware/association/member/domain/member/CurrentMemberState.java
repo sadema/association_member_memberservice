@@ -1,20 +1,19 @@
-package nl.kristalsoftware.association.member.domain.member.event.event_types;
+package nl.kristalsoftware.association.member.domain.member;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
+import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
-import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
-import nl.kristalsoftware.domain.base.BaseEvent;
 
-@Getter
+@Data
 @RequiredArgsConstructor(staticName = "of")
-public class MemberEdited implements BaseEvent {
-
-    private final MemberReference memberReference;
+public class CurrentMemberState {
 
     private final MemberName memberName;
 
     private final MemberBirthDate memberBirthDate;
+
+    private final MemberKind memberKind;
 
 }

@@ -8,6 +8,8 @@ import nl.kristalsoftware.association.member.datastore.types.member.messaging.Me
 import nl.kristalsoftware.association.member.domain.member.event.MemberEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -15,6 +17,11 @@ import org.springframework.stereotype.Component;
 public class MemberEventListener {
 
     private final MemberEventDataProducer memberEventDataProducer;
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void onApplicationEvent(MemberEventData memberEventData) {
+        memberEventDataProducer.produce(memberEventData);
+    }
 
     @EventListener
     public void onApplicationEvent(MemberEvent event) {

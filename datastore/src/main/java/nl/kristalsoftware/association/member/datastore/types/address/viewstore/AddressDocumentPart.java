@@ -4,7 +4,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.domain.address.properties.City;
+import nl.kristalsoftware.association.member.domain.address.properties.Street;
+import nl.kristalsoftware.association.member.domain.address.properties.StreetNumber;
+import nl.kristalsoftware.association.member.domain.address.properties.ZipCode;
 
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,12 +22,15 @@ public class AddressDocumentPart {
 
     private String city;
 
-    public static AddressDocumentPart of(MemberEventData eventData) {
+    public static AddressDocumentPart of(ZipCode zipCode,
+                                         StreetNumber streetNumber,
+                                         Street street,
+                                         City city) {
         return new AddressDocumentPart(
-                eventData.getAddress().getZipCode(),
-                eventData.getAddress().getStreetNumber(),
-                eventData.getAddress().getStreet(),
-                eventData.getAddress().getCity()
+                zipCode.getValue(),
+                streetNumber.getValue(),
+                street.getValue(),
+                city.getValue()
         );
     }
 

@@ -2,7 +2,7 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberQuited;
 import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 
 import javax.persistence.Entity;
@@ -20,10 +20,10 @@ public class MemberQuitedEventEntity extends UUIDBaseEventEntity {
         super(reference, domainEventName);
     }
 
-    public static MemberQuitedEventEntity of(MemberEventData memberEventData) {
+    public static MemberQuitedEventEntity of(MemberQuited memberQuited) {
         return new MemberQuitedEventEntity(
-                memberEventData.getReference(),
-                memberEventData.getDomainEventName()
+                memberQuited.getMemberReference().getValue(),
+                memberQuited.getClass().getSimpleName()
         );
     }
 

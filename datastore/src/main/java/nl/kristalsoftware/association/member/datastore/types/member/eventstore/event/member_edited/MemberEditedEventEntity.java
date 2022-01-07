@@ -3,7 +3,9 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
-import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
+import nl.kristalsoftware.association.member.datastore.types.member.eventstore.event.member_signed_up.AbstractUUIDBaseEventEntity;
+import nl.kristalsoftware.association.member.domain.member.CurrentMemberState;
+import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEdited;
 import nl.kristalsoftware.domain.base.TinyDateType;
 
 import javax.persistence.Entity;
@@ -13,13 +15,25 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity(name = "MemberEditedEvent")
-public class MemberEditedEventEntity extends UUIDBaseEventEntity {
+public class MemberEditedEventEntity extends AbstractUUIDBaseEventEntity<MemberEditedEventEntity> {
 
     private String firstName;
 
     private String lastName;
 
     private LocalDate birthDate;
+
+    private void registerPublicDomainEvent(CurrentMemberState stateBeforeEvent) {
+        MemberEventData memberEventData = MemberEventData.newBuilder()
+                .setDomainEventName(getDomainEventName())
+                .setReference(getReference())
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setBirthDate(TinyDateType.getInstantFromLocalDate(birthDate))
+                .setKind(stateBeforeEvent.getMemberKind().getValue().name())
+                .build();
+        registerEvent(memberEventData);
+    }
 
     private MemberEditedEventEntity(
             UUID reference,
@@ -34,14 +48,16 @@ public class MemberEditedEventEntity extends UUIDBaseEventEntity {
         this.birthDate = birthDate;
     }
 
-    public static MemberEditedEventEntity of(MemberEventData memberEventData) {
-        return new MemberEditedEventEntity(
-                memberEventData.getReference(),
-                memberEventData.getDomainEventName(),
-                memberEventData.getFirstName(),
-                memberEventData.getLastName(),
-                TinyDateType.getLocalDateFromInstant(memberEventData.getBirthDate())
+    public static MemberEditedEventEntity of(MemberEdited memberEdited, CurrentMemberState currentState) {
+        MemberEditedEventEntity memberEditedEventEntity = new MemberEditedEventEntity(
+                memberEdited.getMemberReference().getValue(),
+                memberEdited.getClass().getSimpleName(),
+                memberEdited.getMemberName().getFirstName(),
+                memberEdited.getMemberName().getLastName(),
+                TinyDateType.getLocalDateFromMillis(memberEdited.getMemberBirthDate().getDateInMillis())
         );
+        memberEditedEventEntity.registerPublicDomainEvent(currentState);
+        return memberEditedEventEntity;
     }
 
 }

@@ -16,14 +16,14 @@ import nl.kristalsoftware.association.member.domain.address.properties.Street;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.Aggregate;
 import nl.kristalsoftware.domain.base.BaseAggregateRoot;
+import nl.kristalsoftware.domain.base.PersistenceHandlerPort;
 import nl.kristalsoftware.domain.base.annotations.AggregateRoot;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 
 @Getter
 @AggregateRoot
-public class Address extends BaseAggregateRoot<AddressReference, AddressEvent> implements Aggregate<AddressReference> {
+public class Address extends BaseAggregateRoot<Address,AddressReference> implements Aggregate<AddressReference> {
 
     private Street street;
 
@@ -31,11 +31,11 @@ public class Address extends BaseAggregateRoot<AddressReference, AddressEvent> i
 
     private List<MemberReference> memberReferences;
 
-    private Address(AddressReference reference, ApplicationEventPublisher eventPublisher) {
+    private Address(AddressReference reference, PersistenceHandlerPort<Address> eventPublisher) {
         super(reference, eventPublisher);
     }
 
-    public static Address of(AddressReference reference, ApplicationEventPublisher eventPublisher) {
+    public static Address of(AddressReference reference, PersistenceHandlerPort<Address> eventPublisher) {
         return new Address(reference, eventPublisher);
     }
 

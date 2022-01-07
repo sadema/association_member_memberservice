@@ -12,18 +12,18 @@ import nl.kristalsoftware.association.member.domain.member.event.MemberEvent;
 import nl.kristalsoftware.association.member.domain.member.event.MemberEventDefinition;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressAssigned;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberAddressUnAssigned;
-import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberEdited;
-import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberKindChanged;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberQuited;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
+import nl.kristalsoftware.association.member.domain.member.event.member_edited.MemberEdited;
+import nl.kristalsoftware.association.member.domain.member.event.member_kind_changed.MemberKindChanged;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.Aggregate;
 import nl.kristalsoftware.domain.base.BaseAggregateRoot;
+import nl.kristalsoftware.domain.base.PersistenceHandlerPort;
 import nl.kristalsoftware.domain.base.annotations.AggregateRoot;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.Optional;
 @Slf4j
 @Getter
 @AggregateRoot
-public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> implements Aggregate<MemberReference> {
+public class Member extends BaseAggregateRoot<Member,MemberReference> implements Aggregate<MemberReference> {
 
     private MemberName memberName;
 
@@ -42,12 +42,20 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
 
     private List<AddressReference> addressReferences = new ArrayList<>();
 
-    private Member(MemberReference reference, ApplicationEventPublisher eventPublisher) {
-        super(reference, eventPublisher);
+    private Member(MemberReference reference, PersistenceHandlerPort<Member> basePersistencePort) {
+        super(reference, basePersistencePort);
     }
 
-    public static Member of(MemberReference reference, ApplicationEventPublisher eventPublisher) {
-        return new Member(reference, eventPublisher);
+    public static Member of(MemberReference reference, PersistenceHandlerPort<Member> basePersistencePort) {
+        return new Member(reference, basePersistencePort);
+    }
+
+    public CurrentMemberState getCurrentState() {
+        return CurrentMemberState.of(
+                memberName,
+                memberBirthDate,
+                memberKind
+        );
     }
 
     public void loadData(MemberSignedUp memberSignedUp) {
@@ -79,36 +87,36 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
     }
 
     public void handleCommand(SignUpMember command) {
-        sendEvent(MemberEvent.of(getReference(),
+        sendEvent(MemberSignedUp.of(
                 MemberEventDefinition.MemberSignedUp,
+                getReference(),
                 command.getMemberName(),
                 command.getMemberBirthDate(),
-                command.getMemberKind(),
-                null
+                command.getMemberKind()
         ));
+//        sendEvent(MemberEvent.of(getReference(),
+//                MemberEventDefinition.MemberSignedUp,
+//                command.getMemberName(),
+//                command.getMemberBirthDate(),
+//                command.getMemberKind(),
+//                null
+//        ));
     }
 
     public void handleCommand(EditMember command) {
         if (!memberKind.equals(command.getMemberKind())) {
-            sendEvent(MemberEvent.of(
-                    getReference(),
-                    MemberEventDefinition.MemberKindChanged,
-                    memberName,
-                    memberBirthDate,
-                    command.getMemberKind(),
-                    null
-            ));
+            sendEvent(MemberKindChanged.of(
+                            getReference(),
+                            command.getMemberKind())
+            );
         }
         if (!(memberName.equals(command.getMemberName()) &&
                 memberBirthDate.equals(command.getMemberBirthDate()))) {
-            sendEvent(MemberEvent.of(
-                    getReference(),
-                    MemberEventDefinition.MemberEdited,
-                    command.getMemberName(),
-                    command.getMemberBirthDate(),
-                    memberKind,
-                    null
-            ));
+            sendEvent(MemberEdited.of(
+                            getReference(),
+                            command.getMemberName(),
+                            command.getMemberBirthDate())
+            );
         }
     }
 
@@ -167,8 +175,8 @@ public class Member extends BaseAggregateRoot<MemberReference,MemberEvent> imple
     private boolean isNewAddress(CompoundAddress compoundAddress) {
         return !addressReferences.stream()
                 .anyMatch(it -> it.equals(
-                        AddressReference.of(compoundAddress.getZipCode(), compoundAddress.getStreetNumber())
-                    )
+                                AddressReference.of(compoundAddress.getZipCode(), compoundAddress.getStreetNumber())
+                        )
                 );
     }
 

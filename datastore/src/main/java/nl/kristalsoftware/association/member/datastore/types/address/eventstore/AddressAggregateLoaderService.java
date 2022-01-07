@@ -6,7 +6,7 @@ import nl.kristalsoftware.association.member.domain.address.Address;
 import nl.kristalsoftware.association.member.domain.address.properties.AddressReference;
 import nl.kristalsoftware.datastore.base.eventstore.BaseAggregateLoader;
 import nl.kristalsoftware.domain.base.EventStore;
-import org.springframework.context.ApplicationEventPublisher;
+import nl.kristalsoftware.domain.base.PersistenceHandlerPort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,8 +17,8 @@ public class AddressAggregateLoaderService extends BaseAggregateLoader<Address, 
     }
 
     @Override
-    public Address loadAggregate(AddressReference addressReference, ApplicationEventPublisher eventPublisher) {
-        Address address = Address.of(addressReference, eventPublisher);
+    public Address loadAggregate(AddressReference addressReference, PersistenceHandlerPort<Address> persistenceHandler) {
+        Address address = Address.of(addressReference, persistenceHandler);
         loadEvents(address);
         return address;
     }

@@ -3,8 +3,8 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.kristalsoftware.association.member.MemberEventData;
+import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
 import nl.kristalsoftware.association.member.domain.member.properties.Kind;
-import nl.kristalsoftware.datastore.base.eventstore.event.entity.UUIDBaseEventEntity;
 import nl.kristalsoftware.domain.base.TinyDateType;
 
 import javax.persistence.Entity;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity(name = "MemberSignedUpEvent")
-public class MemberSignedUpEventEntity extends UUIDBaseEventEntity {
+public class MemberSignedUpEventEntity extends AbstractUUIDBaseEventEntity<MemberSignedUpEventEntity> {
 
     private String firstName;
 
@@ -26,6 +26,18 @@ public class MemberSignedUpEventEntity extends UUIDBaseEventEntity {
 
     @Enumerated(EnumType.STRING)
     private Kind kind;
+
+    private void registerPublicDomainEvent() {
+        MemberEventData memberEventData = MemberEventData.newBuilder()
+                .setDomainEventName(getDomainEventName())
+                .setReference(getReference())
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setBirthDate(TinyDateType.getInstantFromLocalDate(birthDate))
+                .setKind(kind.name())
+                .build();
+        registerEvent(memberEventData);
+    }
 
     private MemberSignedUpEventEntity(
             UUID reference,
@@ -42,15 +54,17 @@ public class MemberSignedUpEventEntity extends UUIDBaseEventEntity {
         this.kind = kind;
     }
 
-    public static MemberSignedUpEventEntity of(MemberEventData memberEventData) {
-        return new MemberSignedUpEventEntity(
-                memberEventData.getReference(),
-                memberEventData.getDomainEventName(),
-                memberEventData.getFirstName(),
-                memberEventData.getLastName(),
-                TinyDateType.getLocalDateFromInstant(memberEventData.getBirthDate()),
-                Kind.valueOf(memberEventData.getKind())
+    public static MemberSignedUpEventEntity of(MemberSignedUp memberSignedUp) {
+        MemberSignedUpEventEntity memberSignedUpEventEntity = new MemberSignedUpEventEntity(
+                memberSignedUp.getMemberReference().getValue(),
+                memberSignedUp.getDomainEventName().name(),
+                memberSignedUp.getMemberName().getFirstName(),
+                memberSignedUp.getMemberName().getLastName(),
+                TinyDateType.getLocalDateFromMillis(memberSignedUp.getMemberBirthDate().getDateInMillis()),
+                memberSignedUp.getMemberKind().getValue()
         );
+        memberSignedUpEventEntity.registerPublicDomainEvent();
+        return memberSignedUpEventEntity;
     }
 
 }

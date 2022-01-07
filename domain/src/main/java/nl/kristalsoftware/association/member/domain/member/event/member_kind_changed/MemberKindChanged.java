@@ -1,4 +1,4 @@
-package nl.kristalsoftware.association.member.domain.member.event.event_types;
+package nl.kristalsoftware.association.member.domain.member.event.member_kind_changed;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

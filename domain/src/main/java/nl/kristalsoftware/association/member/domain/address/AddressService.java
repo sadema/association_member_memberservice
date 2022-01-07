@@ -8,8 +8,8 @@ import nl.kristalsoftware.association.member.domain.address.properties.AddressRe
 import nl.kristalsoftware.association.member.domain.address.properties.CompoundAddress;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberReference;
 import nl.kristalsoftware.domain.base.EventStore;
+import nl.kristalsoftware.domain.base.PersistenceHandlerPort;
 import nl.kristalsoftware.domain.base.annotations.DomainService;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +22,8 @@ public class AddressService {
 
     private final EventStore<Address, AddressReference> eventStore;
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final PersistenceHandlerPort<Address> persistenceHandler;
+
 
 //    public AddressReference addAddress(CompoundAddress compoundAddress) {
 //        final Address address = eventStore.loadAggregate(compoundAddress.getAddressReference(), eventPublisher);
@@ -44,7 +45,7 @@ public class AddressService {
 
     public void processAddresses(List<CompoundAddress> memberAddresses, MemberReference memberReference) {
         for (CompoundAddress compoundAddress : memberAddresses) {
-            Address address = eventStore.loadAggregate(AddressReference.of(compoundAddress.getZipCode(), compoundAddress.getStreetNumber()), eventPublisher);
+            Address address = eventStore.loadAggregate(AddressReference.of(compoundAddress.getZipCode(), compoundAddress.getStreetNumber()), persistenceHandler);
             if (address.notExists()) {
                 address.handleCommand(AddAddress.of(compoundAddress));
             }

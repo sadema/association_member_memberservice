@@ -2,16 +2,15 @@ package nl.kristalsoftware.association.member.datastore.types.member.eventstore.
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.kristalsoftware.association.member.MemberEventData;
 import nl.kristalsoftware.association.member.datastore.types.member.viewstore.MemberViewStore;
 import nl.kristalsoftware.association.member.domain.member.Member;
+import nl.kristalsoftware.association.member.domain.member.event.MemberEventDefinition;
 import nl.kristalsoftware.association.member.domain.member.event.event_types.MemberSignedUp;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberBirthDate;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberKind;
 import nl.kristalsoftware.association.member.domain.member.properties.MemberName;
-import nl.kristalsoftware.datastore.base.eventstore.UUIDEventStoreRepository;
-import nl.kristalsoftware.datastore.base.eventstore.event.EventHandler;
-import nl.kristalsoftware.datastore.base.eventstore.event.message.EventMessageHandler;
+import nl.kristalsoftware.datastore.base.eventstore.event.EventLoadHandler;
+import nl.kristalsoftware.datastore.base.eventstore.event.EventSaveHandler;
 import nl.kristalsoftware.domain.base.BaseEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class MemberSignedUpHandler implements EventHandler<Member, MemberSignedUpEventEntity>, EventMessageHandler<MemberEventData> {
+public class MemberSignedUpHandler implements
+        EventLoadHandler<Member, MemberSignedUpEventEntity>,
+        EventSaveHandler<Member, MemberSignedUp> {
 
-    private final UUIDEventStoreRepository eventStoreRepository;
+
+    private final NewUUIDEventStoreRepository eventStoreRepository;
 
     private final MemberViewStore memberViewStore;
 
@@ -30,17 +32,18 @@ public class MemberSignedUpHandler implements EventHandler<Member, MemberSignedU
         return MemberSignedUp.class;
     }
 
-    @Override
     @Transactional
-    public void save(final MemberEventData memberEventData) {
-        eventStoreRepository.save(MemberSignedUpEventEntity.of(memberEventData));
-        memberViewStore.memberSignedUp(memberEventData);
+    public void save(final Member member, final MemberSignedUp memberSignedUp) {
+        eventStoreRepository.save(MemberSignedUpEventEntity.of(memberSignedUp));
+        memberViewStore.memberSignedUp(memberSignedUp);
     }
 
+
     @Override
-    public void loadEventData(final Member member, final MemberSignedUpEventEntity eventEntity) {
+    public void loadEvent(final Member member, final MemberSignedUpEventEntity eventEntity) {
         log.info("MemberSignedUpEventEntity: {} {} {}", eventEntity.getReference(), eventEntity.getDomainEventName(), eventEntity.getFirstName() + " " + eventEntity.getLastName());
         MemberSignedUp memberSignedUp = MemberSignedUp.of(
+                MemberEventDefinition.valueOf(eventEntity.getDomainEventName()),
                 member.getReference(),
                 MemberName.of(eventEntity.getFirstName(), eventEntity.getLastName()),
                 MemberBirthDate.of(eventEntity.getBirthDate()),
